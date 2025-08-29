@@ -1,0 +1,29 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.45f1
+CRC: 1723427489
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 365acef2d32a95dc20fe0f99ba61d01a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 73d2a9615f24b9da4162b01cae9e6aab
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: cdf3bfd37d02934da00e8203b61d096a
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4baff43cb410cc44686f2e4474eee347, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Prefabs/Items/TestItem.prefab
+Dependencies: []

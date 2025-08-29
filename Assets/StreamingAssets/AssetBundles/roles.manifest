@@ -1,0 +1,33 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.45f1
+CRC: 1735030402
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 228500baba9d42dd7265529e0f29971c
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 77c2f2da3eb15741825773e4bee1efb7
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: af356c1505aaea94ca808e8eb862bee2
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: b252d950b7a105544b6a95f685ae8083, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fd2c04b0a7538b448b0c2fb40ac16e72, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fb30271cbfac7ed4a805ed2dfebc7a82, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Prefabs/Roles/NoneRole.prefab
+- Assets/Prefabs/Roles/HumanRole.prefab
+- Assets/Prefabs/Roles/SpectatorRole.prefab
+Dependencies: []
