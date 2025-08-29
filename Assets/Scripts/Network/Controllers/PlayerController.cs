@@ -3,10 +3,11 @@ using UnityEngine;
 
 namespace SLRemake.Network.Controllers
 {
+   
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : NetworkBehaviour
     {
-        public static Vector3 DefaultGravity => new Vector3(0f, -19.6f, 0f);
+        public static Vector3 DefaultGravity => new(0f, -19.6f, 0f);
         [SyncVar]
         public Vector3 Gravity = DefaultGravity;
 
@@ -21,9 +22,7 @@ namespace SLRemake.Network.Controllers
         [SyncVar]
         public float JumpSpeed = 4.9f;
 
-
-        [SerializeField]
-        private CharacterController characterController;
+        public CharacterController characterController;
         Vector3 moveDirection = Vector3.zero;
 
         [HideInInspector]

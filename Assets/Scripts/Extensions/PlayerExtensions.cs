@@ -29,6 +29,15 @@ namespace SLRemake.Extensions
             return hub;
         }
 
+        public static Player GetPlayer(uint netId)
+        {
+            if (!TryGetPlayer(netId, out var hub))
+            {
+                return null;
+            }
+            return hub;
+        }
+
         public static bool TryGetPlayer(GameObject gameObject, out Player player)
         {
             if (gameObject == null)

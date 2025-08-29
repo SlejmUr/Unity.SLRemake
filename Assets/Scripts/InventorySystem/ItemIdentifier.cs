@@ -9,7 +9,7 @@ namespace SLRemake.InventorySystem
     [Serializable]
     public readonly struct ItemIdentifier : IEquatable<ItemIdentifier>
     {
-        public static ItemIdentifier None = new ItemIdentifier(ItemType.None, 0);
+        public static ItemIdentifier None = new(ItemType.None, 0);
 
         public readonly ItemType TypeId;
 

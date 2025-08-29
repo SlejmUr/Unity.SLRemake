@@ -49,7 +49,9 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   ItemTypeId: -2
-  PickupBase: {fileID: 0}
+  PickupBase: {fileID: 739646562550774838, guid: a09eb9e6656db164195b6baf5d704a11, type: 3}
+  ViewModelBase: {fileID: 7194752000490336424, guid: 2dca9569e583a9444911af1a702af9cc, type: 3}
+  MainWeight: 666
 --- !u!114 &1513226223454599958
 MonoBehaviour:
   m_ObjectHideFlags: 0

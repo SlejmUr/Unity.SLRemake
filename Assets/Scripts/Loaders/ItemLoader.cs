@@ -67,20 +67,15 @@ public static class ItemLoader
         {
             _loaded.Clear();
             if (bundle != null)
-            {
-                Debug.Log("Unloading Items Bundle");
                 bundle.Unload(true);
-            }
-                
+
             string filePath = System.IO.Path.Combine(Application.streamingAssetsPath, "AssetBundles");
             filePath = System.IO.Path.Combine(filePath, "items");
-            Debug.Log("Loading Items Bundle");
             bundle = AssetBundle.LoadFromFile(filePath);
             if (bundle == null)
                 throw new Exception("Not found 'Items' AssetBundle");
             GameObject[] objects = bundle.LoadAllAssets<GameObject>();
             ItemBase[] array = objects.Where(x => x.TryGetComponent(out ItemBase _)).Select(x => x.GetComponent<ItemBase>()).ToArray();
-            Debug.Log("Items Count: " + array.Length);
             Array.Sort(array, delegate (ItemBase x, ItemBase y)
             {
                 int itemTypeId = (int)x.ItemTypeId;

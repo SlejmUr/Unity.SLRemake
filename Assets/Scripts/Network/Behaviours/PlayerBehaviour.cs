@@ -8,7 +8,7 @@ namespace SLRemake.Network.Behaviours
         public Player Player { get; private set; }
         public void Start()
         {
-            Player = PlayerExtensions.GetPlayer(this);
+            Player = PlayerExtensions.GetPlayer(netId);
             if (!NetworkServer.active)
                 return;
             OnStart();

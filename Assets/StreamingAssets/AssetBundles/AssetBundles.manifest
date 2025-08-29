@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.0.45f1
-CRC: 2448486197
+CRC: 1288857109
 HashAppended: 0
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: items
+      Name: roles
       Dependencies: {}
     Info_1:
-      Name: roles
+      Name: items
       Dependencies: {}

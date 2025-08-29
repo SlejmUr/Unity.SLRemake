@@ -46,19 +46,14 @@ public static class RoleLoader
         {
             _loaded.Clear();
             if (bundle != null)
-            {
-                Debug.Log("Loading Roles Bundle");
                 bundle.Unload(true);
-            }
             string filePath = System.IO.Path.Combine(Application.streamingAssetsPath, "AssetBundles");
             filePath = System.IO.Path.Combine(filePath, "roles");
-            Debug.Log("Loading Roles Bundle");
             bundle = AssetBundle.LoadFromFile(filePath);
             if (bundle == null)
                 throw new Exception("Not found 'Roles' AssetBundle");
             GameObject[] objects = bundle.LoadAllAssets<GameObject>();
             BaseRole[] array = objects.Where(x => x.TryGetComponent(out BaseRole _)).Select(x => x.GetComponent<BaseRole>()).ToArray();
-            Debug.Log("Roles Count: " + array.Length);
             foreach (var item in array)
             {
                 Debug.Log(item.RoleType);
