@@ -165,6 +165,7 @@ MonoBehaviour:
   ItemType: -1
   Serial: 0
   Weight: 0
+  Rb: {fileID: 2811689116650936296}
 --- !u!114 &2384779081146379884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,9 +195,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b20dc110904e47f8a154cdcf6433eae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 1
+  syncDirection: 0
   syncMode: 0
-  syncInterval: 0
+  syncInterval: 0.1
   target: {fileID: 8924001685883522073}
   syncPosition: 1
   syncRotation: 1

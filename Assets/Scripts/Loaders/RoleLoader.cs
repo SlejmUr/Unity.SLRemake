@@ -9,7 +9,9 @@ namespace SLRemake.Loaders;
 
 public static class RoleLoader
 {
+#if !UNITY_EDITOR
     private static AssetBundle bundle;
+#endif
     private static readonly Dictionary<RoleTypeId, BaseRole> _loaded = new();
     public static bool IsLoaded { get; private set; } = false;
 
@@ -44,17 +46,24 @@ public static class RoleLoader
     {
         try
         {
+            BaseRole[] Roles = new BaseRole[0];
+#if UNITY_EDITOR
+            Roles = Resources.LoadAll<BaseRole>("Roles");
+#else
             _loaded.Clear();
             if (bundle != null)
                 bundle.Unload(true);
+
             string filePath = System.IO.Path.Combine(Application.streamingAssetsPath, "AssetBundles");
             filePath = System.IO.Path.Combine(filePath, "roles");
             bundle = AssetBundle.LoadFromFile(filePath);
             if (bundle == null)
                 throw new Exception("Not found 'Roles' AssetBundle");
             GameObject[] objects = bundle.LoadAllAssets<GameObject>();
-            BaseRole[] array = objects.Where(x => x.TryGetComponent(out BaseRole _)).Select(x => x.GetComponent<BaseRole>()).ToArray();
-            foreach (var item in array)
+            Roles = objects.Where(x => x.TryGetComponent(out BaseRole _)).Select(x => x.GetComponent<BaseRole>()).ToArray();
+#endif
+
+            foreach (var item in Roles)
             {
                 Debug.Log(item.RoleType);
                 _loaded.TryAdd(item.RoleType, item);

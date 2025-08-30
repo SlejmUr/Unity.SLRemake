@@ -194,6 +194,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  Player: {fileID: 695605195295266980}
   CurrentItem: {fileID: 0}
 --- !u!114 &4840599887099437104
 MonoBehaviour:
@@ -210,6 +211,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  Player: {fileID: 695605195295266980}
   CapsuleRender: {fileID: 5846852311611991683}
   MaterialTemplate: {fileID: 2100000, guid: ac0602804a1a7594c920ff070927992c, type: 2}
 --- !u!114 &310910555640959929
@@ -227,6 +229,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  Player: {fileID: 695605195295266980}
   playerCamera: {fileID: 7111010427314276805}
   lookSpeed: 2
   lookXLimit: 45
@@ -246,6 +249,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  Player: {fileID: 695605195295266980}
   Gravity: {x: 0, y: -19.6, z: 0}
   CrouchSpeed: 0
   SneakSpeed: 1.6

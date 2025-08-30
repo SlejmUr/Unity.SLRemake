@@ -24,9 +24,9 @@ namespace SLRemake.Network.Controllers
             // Lock cursor
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            Debug.Log(Player == null);
         }
 
+        [ClientCallback]
         void Update()
         {
             if (!isLocalPlayer)
@@ -35,7 +35,7 @@ namespace SLRemake.Network.Controllers
             if (!CanMove)
                 return;
 
-            if (Input.GetKey(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
                 Cursor.lockState = Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked;
                 Cursor.visible = !Cursor.visible;
@@ -44,12 +44,12 @@ namespace SLRemake.Network.Controllers
             if (Cursor.visible)
                 return;
 
-            if (Input.GetKey(KeyCode.Q))
+            if (Input.GetKeyDown(KeyCode.Q))
             {
                 Player.InventoryManager.CmdRequestDropCurrentItem();
             }
 
-            if (Input.GetKey(KeyCode.F))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 int index = Player.InventoryManager.Items.RandomIndex();
                 Player.InventoryManager.CmdRequestSelectItem(index);

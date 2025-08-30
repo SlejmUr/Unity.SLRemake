@@ -12,7 +12,9 @@ namespace SLRemake.Loaders;
 
 public static class ItemLoader
 {
+#if !UNITY_EDITOR
     private static AssetBundle bundle;
+#endif
     private static readonly Dictionary<ItemType, ItemBase> _loaded = new();
     public static bool IsLoaded { get; private set; }
 
@@ -65,6 +67,10 @@ public static class ItemLoader
         ItemType itemType = ItemType.None;
         try
         {
+            ItemBase[] Items = new ItemBase[0];
+#if UNITY_EDITOR
+            Items = Resources.LoadAll<ItemBase>("Items");
+#else
             _loaded.Clear();
             if (bundle != null)
                 bundle.Unload(true);
@@ -75,13 +81,14 @@ public static class ItemLoader
             if (bundle == null)
                 throw new Exception("Not found 'Items' AssetBundle");
             GameObject[] objects = bundle.LoadAllAssets<GameObject>();
-            ItemBase[] array = objects.Where(x => x.TryGetComponent(out ItemBase _)).Select(x => x.GetComponent<ItemBase>()).ToArray();
-            Array.Sort(array, delegate (ItemBase x, ItemBase y)
+            Items = objects.Where(x => x.TryGetComponent(out ItemBase _)).Select(x => x.GetComponent<ItemBase>()).ToArray();
+#endif
+            Array.Sort(Items, delegate (ItemBase x, ItemBase y)
             {
                 int itemTypeId = (int)x.ItemTypeId;
                 return itemTypeId.CompareTo((int)y.ItemTypeId);
             });
-            foreach (var itemBase in array)
+            foreach (var itemBase in Items)
             {
                 if (itemBase.ItemTypeId != ItemType.None)
                 {

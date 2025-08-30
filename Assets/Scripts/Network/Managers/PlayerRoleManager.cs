@@ -46,7 +46,7 @@ namespace SLRemake.Network.Managers
                 throw new Exception($"{roleTypeId} not found!");
 
             Transform transform = baseRole.transform;
-            transform.parent = base.transform;
+            transform.parent = this.transform;
             transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
             CurrentRole = baseRole;
             CurrentRole.Init(Player);

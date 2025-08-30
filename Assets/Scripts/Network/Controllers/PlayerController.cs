@@ -1,11 +1,12 @@
 using Mirror;
+using SLRemake.Network.Behaviours;
 using UnityEngine;
 
 namespace SLRemake.Network.Controllers
 {
    
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerController : NetworkBehaviour
+    public class PlayerController : PlayerBehaviour
     {
         public static Vector3 DefaultGravity => new(0f, -19.6f, 0f);
         [SyncVar]

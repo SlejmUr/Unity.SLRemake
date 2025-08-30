@@ -5,9 +5,7 @@ using SLRemake.InventorySystem.Items.Pickups;
 using SLRemake.Loaders;
 using SLRemake.Network.Behaviours;
 using System.Collections;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace SLRemake.Network.Managers
 {
@@ -19,15 +17,9 @@ namespace SLRemake.Network.Managers
         [SyncVar]
         public ItemBase CurrentItem;
 
-        public override void OnStart()
+        public override void OnStartAuthority()
         {
-            base.OnStart();
             Items.OnAdd += Items_OnAdded;
-        }
-
-        public override void OnStartClient()
-        {
-            base.OnStartClient();
             StartCoroutine(WaitThenAddItem());
         }
 
@@ -51,9 +43,7 @@ namespace SLRemake.Network.Managers
         {
             if (Items.Count > index)
                 return;
-            var item = Items[index];
-            item.OnEquipped();
-            CurrentItem = item;
+            SelectItem(index);
         }
 
         [Command]
@@ -72,12 +62,21 @@ namespace SLRemake.Network.Managers
             DropItem(CurrentItem);
         }
 
+        private void SelectItem(int index)
+        {
+            var item = Items[index];
+            item.OnEquipped();
+            CurrentItem = item;
+        }
+
         private void DropItem(ItemBase item)
         {
             if (item == null)
                 return;
+            CurrentItem = null;
             var pickup = CreateItemPickup(item);
             pickup.transform.SetPositionAndRotation(Player.transform.position, Player.transform.rotation * item.PickupBase.transform.rotation);
+            Items.Remove(item);
         }
 
         private void Items_OnAdded(int index)
@@ -126,6 +125,7 @@ namespace SLRemake.Network.Managers
             item.Weight = itemBase.Weight;
             item.Serial = itemBase.ItemSerial;
             NetworkServer.Spawn(item.gameObject);
+            item.gameObject.GetComponent<Rigidbody>().WakeUp();
             return item;
         }
     }
