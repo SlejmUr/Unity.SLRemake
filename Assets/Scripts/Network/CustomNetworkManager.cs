@@ -1,5 +1,4 @@
 using Mirror;
-using SLRemake.Network.Interests;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -13,7 +12,6 @@ namespace SLRemake.Network
         public static event Action OnClientConnected;
         public override void OnClientConnect()
         {
-            Debug.Log("OnClientConnect!");
             base.OnClientConnect();
             OnClientConnected?.Invoke();
         }
@@ -24,25 +22,32 @@ namespace SLRemake.Network
             StartCoroutine(WaitThenStartOffline());
         }
 
-        public override void OnStartServer()
+        IEnumerator WaitThenStartOffline()
         {
-            Debug.Log("OnStartServer!");
-            base.OnStartServer();
+            yield return new WaitForSeconds(1f);
+            if (!NetworkServer.active)
+                SceneManager.LoadScene("Offline", LoadSceneMode.Additive);
         }
+
 
         public override void OnServerAddPlayer(NetworkConnectionToClient conn)
         {
-            Debug.Log("OnServerAddPlayer!");
             base.OnServerAddPlayer(conn);
-            Debug.Log("Server Add Player!");
+            if (conn.identity.gameObject.TryGetComponent(out Player player) && player != null)
+            {
+                StartCoroutine(WaitThenSetRole(player));
+            }    
         }
 
-        IEnumerator WaitThenStartOffline()
+        IEnumerator WaitThenSetRole(Player player)
         {
             yield return new WaitForSeconds(2f);
-            Debug.Log(NetworkServer.active);
-            if (!NetworkServer.active)
-                SceneManager.LoadScene("Offline", LoadSceneMode.Additive);
+            if (player != null)
+            {
+                var currentrole = player.RoleManager.CurrentRole;
+                player.RoleManager.RoleType = (RoleTypeId.ClassD);
+            }
+                
         }
     }
 

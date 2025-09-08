@@ -8,11 +8,11 @@ namespace SLRemake.Network.Interests
         public override bool OnCheckObserver(NetworkConnectionToClient newObserver)
         {
             // If the observer is not player we dont care.
-            if (!PlayerExtensions.TryGetPlayer(newObserver.identity, out Player observerPlayer))
+            if (!PlayerExtensions.TryGetPlayer(newObserver, out Player observerPlayer))
                 return true;
 
             // If the observer is not player we dont care.
-            if (!PlayerExtensions.TryGetPlayer(netId, out Player player))
+            if (!PlayerExtensions.TryGetPlayer(gameObject, out Player player))
                 return true;
 
             // If its a Spectator role then we good.
@@ -22,7 +22,7 @@ namespace SLRemake.Network.Interests
         public override bool OnRebuildObserver(NetworkConnectionToClient newObserver)
         {
             // If the observer is not player we dont care.
-            if (!PlayerExtensions.TryGetPlayer(newObserver.identity, out Player player))
+            if (!PlayerExtensions.TryGetPlayer(newObserver, out Player player))
                 return true;
 
             // If its a Spectator role then we good.

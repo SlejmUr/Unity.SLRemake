@@ -22,7 +22,7 @@ namespace SLRemake.Extensions
 
         public static int RandomIndex<T>(this IList<T> list)
         {
-            return Random.Range(0, list.Count);
+            return Random.Range(0, list.Count - 1);
         }
 
         public static bool TryGetRandomItem<T>(this IList<T> list, out T random)

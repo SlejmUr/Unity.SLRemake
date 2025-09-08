@@ -9,9 +9,11 @@ namespace SLRemake.Network.Managers
 {
     public class PlayerRoleManager : PlayerBehaviour
     {
-        public static Action<Player, RoleTypeId> OnServerRoleSet;
+        public static Action<Player, RoleTypeId> OnRoleSet;
+        public static Action<Player, RoleTypeId, RoleTypeId> OnRoleChanged;
 
-        private bool _anySet;
+        [SyncVar(hook = nameof(OnRoleTypeIdChanged))]
+        public RoleTypeId RoleType;
 
         private BaseRole role;
 
@@ -22,39 +24,28 @@ namespace SLRemake.Network.Managers
         {
             get
             {
-                if (!_anySet)
-                    ServerSetRole(RoleTypeId.None);
+                if (role == null)
+                    RoleType = RoleTypeId.None;
                 return role;
             }
-            set
-            {
-                role = value;
-                _anySet = true;
-            }
         }
 
-        [Server]
-        public void ServerSetRole(RoleTypeId roleTypeId)
+        private void OnRoleTypeIdChanged(RoleTypeId old, RoleTypeId latest)
         {
-            InitializeNewRole(roleTypeId);
-            OnServerRoleSet?.Invoke(Player, roleTypeId);  
-        }
-
-        public void InitializeNewRole(RoleTypeId roleTypeId)
-        {
-            if (!RoleLoader.TryGetItem(roleTypeId, out BaseRole baseRole))
-                throw new Exception($"{roleTypeId} not found!");
-
-            Transform transform = baseRole.transform;
-            transform.parent = this.transform;
-            transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-            CurrentRole = baseRole;
+            if (!RoleLoader.TryGetItem(latest, out BaseRole baseRole))
+                throw new Exception($"{latest} not found!");
+            if (role != null)
+                Destroy(role.gameObject);
+            BaseRole createdRole = Instantiate(baseRole, Vector3.zero, Quaternion.identity, transform);
+            role = createdRole;
             CurrentRole.Init(Player);
             CapsuleRender.sharedMaterial = new(MaterialTemplate)
             {
                 color = CurrentRole.RoleColor
             };
             NetworkServer.RebuildObservers(netIdentity, false);
+            OnRoleSet?.Invoke(Player, latest);
+            OnRoleChanged?.Invoke(Player, old, latest);
         }
     }
 

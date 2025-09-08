@@ -13,7 +13,11 @@ namespace SLRemake.InventorySystem.Items
         public static readonly HashSet<ItemBase> Instances = new();
 
         public ItemType ItemTypeId;
-        public ushort ItemSerial { get; internal set; }
+
+        [ShowInInspector]
+        private ushort serial;
+        
+        public ushort ItemSerial { get => serial; internal set => serial = value; }
         public ItemPickupBase PickupBase;
         public ViewModelBase ViewModelBase;
 
@@ -38,10 +42,12 @@ namespace SLRemake.InventorySystem.Items
 
         public virtual void OnAdded(ItemPickupBase pickup)
         {
+
         }
 
         public virtual void OnRemoved(ItemPickupBase pickup)
         {
+
         }
 
         public virtual void OnTemplateReloaded(bool loaded)
@@ -51,7 +57,7 @@ namespace SLRemake.InventorySystem.Items
 
         public virtual void OnEquipped()
         {
-
+            
         }
 
         public virtual void OnHolstered()
@@ -59,6 +65,10 @@ namespace SLRemake.InventorySystem.Items
 
         }
 
+        public virtual void Update()
+        {
+
+        }
     }
 
 }

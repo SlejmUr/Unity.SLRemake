@@ -4,9 +4,8 @@ using UnityEngine;
 
 namespace SLRemake.Network.Controllers
 {
-   
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerController : PlayerBehaviour
+    public class PlayerMovementController : PlayerBehaviour
     {
         public static Vector3 DefaultGravity => new(0f, -19.6f, 0f);
         [SyncVar]
@@ -25,9 +24,16 @@ namespace SLRemake.Network.Controllers
 
         public CharacterController characterController;
         Vector3 moveDirection = Vector3.zero;
+        protected Transform CachedTransform;
 
         [HideInInspector]
         public bool CanMove = true;
+
+        public override void OnStartLocalPlayer()
+        {
+            base.OnStartLocalPlayer();
+            CachedTransform = transform;
+        }
 
         void Update()
         {
@@ -35,8 +41,8 @@ namespace SLRemake.Network.Controllers
                 return;
 
             // We are grounded, so recalculate move direction based on axes
-            Vector3 forward = transform.TransformDirection(Vector3.forward);
-            Vector3 right = transform.TransformDirection(Vector3.right);
+            Vector3 forward = CachedTransform.TransformDirection(Vector3.forward);
+            Vector3 right = CachedTransform.TransformDirection(Vector3.right);
             // Press Left Shift to run
             bool isRunning = Input.GetKey(KeyCode.LeftShift);
             float curSpeedX = CanMove ? (isRunning ? SprintSpeed : WalkSpeed) * Input.GetAxis("Vertical") : 0;
@@ -57,7 +63,6 @@ namespace SLRemake.Network.Controllers
             {
                 moveDirection += 0.5f * Time.deltaTime * Gravity;
             }
-
             characterController.Move(moveDirection * Time.deltaTime);
         }
     }

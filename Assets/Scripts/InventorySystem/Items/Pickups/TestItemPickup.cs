@@ -7,6 +7,7 @@ namespace SLRemake.InventorySystem.Items.Pickups
 {
     public class TestItemPickup : ItemPickupBase
     {
+
     }
 
 }

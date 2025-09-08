@@ -19,6 +19,18 @@ namespace SLRemake.InventorySystem.Items.ViewModel
             IsLocal = true;
             IsSpectator = false;
         }
+
+        public void InitSpectator(Player player, ItemBase itemBase)
+        {
+            ParentItem = itemBase;
+            Owner = player;
+            IsLocal = false;
+            IsSpectator = true;
+        }
+
+        public virtual void OnEquipped()
+        {
+        }
     }
 
 }

@@ -1,4 +1,5 @@
 using Mirror;
+using SLRemake.Network.Behaviours;
 using UnityEngine;
 
 namespace SLRemake.InventorySystem.Items.Pickups
@@ -12,30 +13,11 @@ namespace SLRemake.InventorySystem.Items.Pickups
         [SyncVar(hook = nameof(OnWeightChanged))]
         public float Weight;
 
-        public Rigidbody Rb;
-
-        // This need testing for real.
-        public bool IsFrozen
-        {
-            get
-            {
-                if (Rb.isKinematic)
-                    return Rb.IsSleeping();
-                return false;
-            }
-            set
-            {
-                Rb.isKinematic = value;
-                if (!value)
-                    Rb.Sleep();
-                else
-                    Rb.WakeUp();
-            }
-        }
+        public RigidbodyNetworkSync Rb;
 
         private void OnWeightChanged(float _, float newWeight)
         {
-            Rb.mass = Mathf.Max(0.001f, newWeight);
+            Rb.Rb.mass = Mathf.Max(0.001f, newWeight);
         }
     }
 }

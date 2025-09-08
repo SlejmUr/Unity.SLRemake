@@ -6,11 +6,10 @@ namespace SLRemake.Network.Behaviours
     {
         public Player Player;
 
-        private void Start()
+        public void Awake()
         {
-            if (Player = null)
+            if (Player == null)
                 Player = GetComponent<Player>();
         }
     }
-
 }

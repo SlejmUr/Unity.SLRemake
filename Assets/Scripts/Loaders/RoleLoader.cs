@@ -65,7 +65,6 @@ public static class RoleLoader
 
             foreach (var item in Roles)
             {
-                Debug.Log(item.RoleType);
                 _loaded.TryAdd(item.RoleType, item);
             }
             IsLoaded = true;

@@ -1,15 +1,13 @@
 using Mirror;
 using SLRemake.Network;
-using System;
 using System.Collections.Generic;
-using System.Security.Principal;
 using UnityEngine;
 
 namespace SLRemake.Extensions
 {
     public static class PlayerExtensions
     {
-        internal static readonly Dictionary<uint, Player> PlayerByIds = new();
+        internal static readonly Dictionary<GameObject, Player> PlayerByGameObject = new();
 
         public static Player GetPlayer(GameObject gameObject)
         {
@@ -29,15 +27,6 @@ namespace SLRemake.Extensions
             return hub;
         }
 
-        public static Player GetPlayer(uint netId)
-        {
-            if (!TryGetPlayer(netId, out var hub))
-            {
-                return null;
-            }
-            return hub;
-        }
-
         public static bool TryGetPlayer(GameObject gameObject, out Player player)
         {
             if (gameObject == null)
@@ -45,7 +34,7 @@ namespace SLRemake.Extensions
                 player = null;
                 return false;
             }
-            return gameObject.TryGetComponent(out player);
+            return PlayerByGameObject.TryGetValue(gameObject, out player) || gameObject.TryGetComponent(out player);
         }
 
         public static bool TryGetPlayer(NetworkConnection connection, out Player player)
@@ -56,30 +45,7 @@ namespace SLRemake.Extensions
                 player = null;
                 return false;
             }
-            if (!PlayerByIds.TryGetValue(identity.netId, out player))
-            {
-                return identity.TryGetComponent(out player);
-            }
-            return true;
-        }
-
-        public static bool TryGetPlayer(NetworkIdentity identity, out Player player)
-        {
-            if (identity == null)
-            {
-                player = null;
-                return false;
-            }
-            if (!PlayerByIds.TryGetValue(identity.netId, out player))
-            {
-                return identity.TryGetComponent(out player);
-            }
-            return true;
-        }
-
-        public static bool TryGetPlayer(uint netId, out Player player)
-        {
-            return PlayerByIds.TryGetValue(netId, out player);
+            return TryGetPlayer(connection.identity.gameObject, out player);
         }
     }
 

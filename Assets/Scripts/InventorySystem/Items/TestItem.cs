@@ -13,6 +13,14 @@ namespace SLRemake.InventorySystem.Items
             base.OnEquipped();
             Debug.Log("AAAA TEST ITEM EQUIPEDDEDDDED!");
         }
+
+        public override void Update()
+        {
+            if (Input.GetKeyDown( KeyCode.Mouse1))
+            {
+                Debug.Log("TsetItem mouse1!");
+            }
+        }
     }
 
 }
