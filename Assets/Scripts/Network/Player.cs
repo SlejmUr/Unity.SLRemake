@@ -20,6 +20,7 @@ namespace SLRemake.Network
         public PlayerInventoryManager InventoryManager;
         public PlayerMovementController MovementController;
         public PlayerInputController InputController;
+        public PlayerLookManager LookManager;
 
         private void Awake()
         {

@@ -2,69 +2,132 @@ using Mirror;
 using SLRemake.Extensions;
 using SLRemake.Network.Behaviours;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace SLRemake.Network.Controllers
 {
-    public class PlayerInputController : PlayerBehaviour
+    public class PlayerInputController : PlayerBehaviour, PlayerInputAction.IPlayerActions
     {
-        public Camera PlayerCamera;
-        public AudioListener Listener;
-        public float lookSpeed = 2.0f;
-        public float lookXLimit = 45.0f;
-        float rotationX = 0;
+        private PlayerInputAction m_Actions;
+        private PlayerInputAction.PlayerActions m_Player;
 
-        [HideInInspector]
-        public bool CanMove = true;
+        public PlayerInput PlayerInput;
+
+        [SyncVar]
+        public Vector2 Move = Vector2.zero;
+        //[SyncVar]
+        public Vector2 Look;
+        [SyncVar]
+        public bool IsSprinting;
+        [SyncVar]
+        public bool IsCrouching;
+        [SyncVar]
+        public bool IsAiming;
+        [SyncVar]
+        public bool IsFiring;
+        [SyncVar]
+        public bool IsThrowing;
+        [SyncVar]
+        public bool IsCancelled;
+        [SyncVar]
+        public bool IsJumping;
 
         public override void OnStartAuthority()
         {
             if (!isLocalPlayer)
                 return;
+            PlayerInput.enabled = true;
+            m_Actions = new();
+            m_Player = m_Actions.Player;
+            m_Player.AddCallbacks(this);
+            m_Player.Enable();
 
-            PlayerCamera.enabled = true;
-            Listener.enabled = true;
             // Lock cursor
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
 
-        [ClientCallback]
         void Update()
         {
             if (!isLocalPlayer)
                 return;
 
-            if (!CanMove)
+            Vector2 temp = m_Player.Move.ReadValue<Vector2>();
+            if (Move != temp)
+                Move = temp;
+            temp = m_Player.Look.ReadValue<Vector2>();
+            if (Look != temp)
+                Look = temp;
+        }
+
+        public void OnMove(InputAction.CallbackContext context)
+        {
+
+        }
+
+        public void OnLook(InputAction.CallbackContext context)
+        {
+
+        }
+
+        public void OnFire(InputAction.CallbackContext context)
+        {
+            IsFiring = context.ReadValueAsButton();
+        }
+
+        public void OnThrow(InputAction.CallbackContext context)
+        {
+            IsThrowing = context.ReadValueAsButton();
+        }
+
+        public void OnSelect(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
                 return;
+            var key = context.control.name;
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (byte.TryParse(key, out var value))
             {
-                Cursor.lockState = Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.Confined : CursorLockMode.Locked;
-                Cursor.visible = !Cursor.visible;
+                // TODO check and stuff.
+                //Player.InventoryManager.CmdRequestSelectItem(value);
             }
+        }
 
-            if (Cursor.visible)
+        public void OnSelectScroll(InputAction.CallbackContext context)
+        {
+            if (!context.performed)
                 return;
-
-            if (Input.GetKeyDown(KeyCode.Q))
+            var scroll = context.ReadValue<Vector2>();
+            switch (scroll.y)
             {
-                Player.InventoryManager.CmdRequestDropCurrentItem();
-                Player.InventoryManager.CmdRequestItem( InventorySystem.ItemType.Test, 0);
-                Player.InventoryManager.CmdRequestSelectItem(0);
-            }
+                case -1:
+                    {
 
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                int index = Player.InventoryManager.Items.RandomIndex();
-                Debug.Log(Player.InventoryManager.Items.Count);
-                Debug.Log(index);
-                Player.InventoryManager.CmdRequestSelectItem(index);
-            }
+                    }
+                    return;
+                case 1:
+                    {
 
-            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
-            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            PlayerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+                    }
+                    return;
+                default:
+                    return;
+            }
+        }
+
+        public void OnJump(InputAction.CallbackContext context)
+        {
+            IsJumping = context.ReadValueAsButton();
+        }
+
+        public void OnSprint(InputAction.CallbackContext context)
+        {
+            IsSprinting = context.ReadValueAsButton();
+        }
+
+        public void OnSneak(InputAction.CallbackContext context)
+        {
+            IsCrouching = context.ReadValueAsButton();
         }
     }
 }

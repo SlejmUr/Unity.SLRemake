@@ -12,8 +12,6 @@ namespace SLRemake.Network.Controllers
         public Vector3 Gravity = DefaultGravity;
 
         [SyncVar]
-        public float CrouchSpeed = 0f;
-        [SyncVar]
         public float SneakSpeed = 1.6f;
         [SyncVar]
         public float WalkSpeed = 3.9f;
@@ -23,47 +21,76 @@ namespace SLRemake.Network.Controllers
         public float JumpSpeed = 4.9f;
 
         public CharacterController characterController;
-        Vector3 moveDirection = Vector3.zero;
-        protected Transform CachedTransform;
+        public PlayerInputController InputController;
+
+        [ReadOnly]
+        private Vector3 velocity = Vector3.zero;
+
+        public Vector3 Velocity => velocity;
 
         [HideInInspector]
         public bool CanMove = true;
 
-        public override void OnStartLocalPlayer()
-        {
-            base.OnStartLocalPlayer();
-            CachedTransform = transform;
-        }
-
-        void Update()
+        private void Update()
         {
             if (!isLocalPlayer)
                 return;
+            UpdateMovement();
+        }
 
-            // We are grounded, so recalculate move direction based on axes
-            Vector3 forward = CachedTransform.TransformDirection(Vector3.forward);
-            Vector3 right = CachedTransform.TransformDirection(Vector3.right);
-            // Press Left Shift to run
-            bool isRunning = Input.GetKey(KeyCode.LeftShift);
-            float curSpeedX = CanMove ? (isRunning ? SprintSpeed : WalkSpeed) * Input.GetAxis("Vertical") : 0;
-            float curSpeedY = CanMove ? (isRunning ? SprintSpeed : WalkSpeed) * Input.GetAxis("Horizontal") : 0;
-            float movementDirectionY = moveDirection.y;
-            moveDirection = (forward * curSpeedX) + (right * curSpeedY);
+        private Vector3 WorldDirection()
+        {
+            Vector2 move = InputController.Move;
+            return CachedTransform.TransformDirection(new Vector3(move.x, 0, move.y)).normalized;
+        }
 
-            if (Input.GetButton("Jump") && CanMove && characterController.isGrounded)
+        private void HandleJump()
+        {
+            if (!characterController.isGrounded)
             {
-                moveDirection.y = JumpSpeed;
+                velocity += 0.5f * Time.deltaTime * Gravity;
             }
             else
             {
-                moveDirection.y = movementDirectionY;
-            }
+                velocity.y = -0.5f;
 
-            if (!characterController.isGrounded)
-            {
-                moveDirection += 0.5f * Time.deltaTime * Gravity;
+                if (InputController.IsJumping)
+                {
+                    velocity.y = JumpSpeed;
+                }
             }
-            characterController.Move(moveDirection * Time.deltaTime);
+        }
+
+        [Command]
+        void UpdateMovement()
+        {
+            float speed = WalkSpeed;
+
+            if (InputController.IsSprinting)
+                speed = SprintSpeed;
+
+            if (InputController.IsCrouching)
+                speed = SneakSpeed;
+
+            Vector3 world = WorldDirection();
+            velocity.x = world.x * speed;
+            velocity.z = world.z * speed;
+
+            HandleJump();
+
+            MoveVelocity(velocity * Time.deltaTime);
+        }
+
+        
+        private void MoveVelocity(Vector3 vector3)
+        {
+            characterController.Move(vector3);
+        }
+
+        [Command]
+        public void Teleport(Vector3 pos)
+        {
+            CachedTransform.position = pos;
         }
     }
 }

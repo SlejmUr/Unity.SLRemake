@@ -1,4 +1,5 @@
 using Mirror;
+using SLRemake.Extensions;
 using SLRemake.InventorySystem;
 using SLRemake.InventorySystem.Items;
 using SLRemake.InventorySystem.Items.Pickups;
@@ -41,7 +42,9 @@ namespace SLRemake.Network.Managers
         [Command]
         public void CmdRequestItem(ItemType itemType, ushort serial)
         {
-            Items.Add(CreateItem(itemType, serial));
+            if (itemType is ItemType.None)
+                return;
+            Items.Add(InventoryExtension.CreateItem(itemType, serial));
         }
 
         [Command]
@@ -56,22 +59,22 @@ namespace SLRemake.Network.Managers
         }
 
         [Command]
-        public void CmdRequestDropItem(int index)
+        public void CmdRequestDropItem(int index, bool throwing)
         {
             if (Items.Count < index)
             {
                 Debug.Log("Items.Count < index | " + index);
                 return;
             }
-            DropItem(index);
+            DropItem(index, throwing);
         }
 
         [Command]
-        public void CmdRequestDropCurrentItem()
+        public void CmdRequestDropCurrentItem(bool throwing)
         {
             if (CurrentItem == null)
                 return;
-            DropItem(Items.IndexOf(CurrentItem));
+            DropItem(Items.IndexOf(CurrentItem), throwing);
         }
 
         private void SelectItem(int index)
@@ -89,33 +92,47 @@ namespace SLRemake.Network.Managers
             item.gameObject.SetActive(true);
             item.OnHolstered();
             CurrentItem = item;
-            if (CurrentViewModel != null)
-                Destroy(CurrentViewModel);
-            CurrentViewModel = Instantiate(CurrentItem.ViewModelBase, Player.InputController.PlayerCamera.transform);
-            CurrentViewModel.InitLocal(CurrentItem);
-            CurrentViewModel.OnEquipped();
+            ChangeViewModel();
             item.OnEquipped();
             OnCurrentItemChangedEvent?.Invoke(Player, prevItem, CurrentItem);
             prevItem = CurrentItem;
         }
 
-        private void DropItem(int index)
+        private void DropItem(int index, bool throwing)
         {
             if (Items.Count < index)
                 return;
             if (CurrentItem != null && Items.IndexOf(CurrentItem) == index)
             {
-                SelectItem(index);
+                // Deselect current item.
+                SelectItem(-1);
             }
             ItemBase item = Items[index];
+            ChangeViewModel();
+            var pickup = InventoryExtension.CreateItemPickup(item, Player.transform.position + Player.transform.forward, Player.transform.rotation * item.PickupBase.transform.rotation);
+            if (throwing)
+            {
+                pickup.Rb.Rb.AddForce(Player.transform.forward);
+            }
+            Items.Remove(item);
+            InventoryExtension.RemoveItem(item, pickup);
+        }
+
+
+        private void ChangeViewModel()
+        {
             if (CurrentViewModel != null)
                 Destroy(CurrentViewModel);
-            CurrentViewModel = null;
-            var pickup = CreateItemPickup(item);
-            pickup.transform.SetPositionAndRotation(Player.transform.position + Player.transform.forward, Player.transform.rotation * item.PickupBase.transform.rotation);
-            Items.Remove(item);
-            item.OnRemoved(pickup);
-            NetworkServer.Destroy(item.gameObject);
+            if (CurrentItem == null)
+            {
+                CurrentViewModel = null;
+                return;
+            }
+            /*
+            CurrentViewModel = Instantiate(CurrentItem.ViewModelBase, Player.InputController.PlayerCamera.transform);
+            CurrentViewModel.InitLocal(CurrentItem);
+            CurrentViewModel.OnEquipped();
+            */
         }
 
         private void Items_OnAdded(int index)
@@ -123,52 +140,6 @@ namespace SLRemake.Network.Managers
             var item = Items[index];
             item.Owner = Player;
             item.transform.SetParent(Player.transform, false);
-        }
-
-        // TODO: Move these outside!
-
-        public ItemBase CreateItem(ItemType itemType, ushort? serial = null)
-        {
-            if (!NetworkServer.active)
-                throw new System.Exception("Server Only");
-            if (!serial.HasValue || serial == 0)
-                serial = ItemSerialGenerator.GenerateNext();
-            if (!ItemLoader.TryGetItem(itemType, out ItemBase itemBase))
-                throw new System.Exception($"{itemType} not found!");
-            ItemBase item = Instantiate(itemBase);
-            item.ItemSerial = serial.Value;
-            NetworkServer.Spawn(item.gameObject);
-            item.gameObject.SetActive(false);
-            return item;
-        }
-
-        public ItemPickupBase CreateItemPickup(ItemType itemType, ushort? serial = null)
-        {
-            if (!NetworkServer.active)
-                throw new System.Exception("Server Only");
-            if (!serial.HasValue || serial == 0)
-                serial = ItemSerialGenerator.GenerateNext();
-            if (!ItemLoader.TryGetItem(itemType, out ItemBase itemBase))
-                throw new System.Exception($"{itemType} not found!");
-            var item = Instantiate(itemBase.PickupBase);
-            item.ItemType = itemBase.ItemTypeId;
-            item.Weight = itemBase.Weight;
-            item.Serial = serial.Value;
-            NetworkServer.Spawn(item.gameObject);
-            return item;
-        }
-
-        public ItemPickupBase CreateItemPickup(ItemBase itemBase)
-        {
-            if (!NetworkServer.active)
-                throw new System.Exception("Server Only");
-            var item = Instantiate(itemBase.PickupBase);
-            item.ItemType = itemBase.ItemTypeId;
-            item.Weight = itemBase.Weight;
-            item.Serial = itemBase.ItemSerial;
-            NetworkServer.Spawn(item.gameObject);
-            item.gameObject.GetComponent<Rigidbody>().WakeUp();
-            return item;
         }
     }
 }
