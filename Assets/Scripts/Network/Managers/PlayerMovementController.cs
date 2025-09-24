@@ -23,7 +23,6 @@ namespace SLRemake.Network.Controllers
         public CharacterController characterController;
         public PlayerInputController InputController;
 
-        [ReadOnly]
         private Vector3 velocity = Vector3.zero;
 
         public Vector3 Velocity => velocity;
@@ -46,6 +45,7 @@ namespace SLRemake.Network.Controllers
 
         private void HandleJump()
         {
+            Debug.Log(characterController.isGrounded);
             if (!characterController.isGrounded)
             {
                 velocity += 0.5f * Time.deltaTime * Gravity;
@@ -57,6 +57,7 @@ namespace SLRemake.Network.Controllers
                 if (InputController.IsJumping)
                 {
                     velocity.y = JumpSpeed;
+                    Debug.Log("setting jump speed");
                 }
             }
         }
@@ -77,14 +78,19 @@ namespace SLRemake.Network.Controllers
             velocity.z = world.z * speed;
 
             HandleJump();
-
+            Debug.Log(characterController.isGrounded);
             MoveVelocity(velocity * Time.deltaTime);
+            
+            Debug.Log(characterController.isGrounded);
         }
 
-        
-        private void MoveVelocity(Vector3 vector3)
+
+        [Command]
+        private void MoveVelocity(Vector3 move)
         {
-            characterController.Move(vector3);
+            Debug.Log(characterController.isGrounded);
+            characterController.Move(move);
+            Debug.Log(characterController.isGrounded);
         }
 
         [Command]

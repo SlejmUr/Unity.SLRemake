@@ -52,18 +52,21 @@ namespace SLRemake.Network.Managers
                 currentLook = Vector2.SmoothDamp(currentLook, targetLook, ref smoothLookVelocity, 1f / Smoothing);
             else
                 currentLook = targetLook;
-
-            SetLook(currentLook);
+            float mouseX = Sensitivity * currentLook.x;
+            float mouseY = Sensitivity * currentLook.y;
+            verticalRotation = Mathf.Clamp(verticalRotation - mouseY, -LookVerticalLimit, LookVerticalLimit);
+            
+            SetLook(new(mouseX, verticalRotation));
+            PlayerCamera.transform.localRotation = Quaternion.Euler(verticalRotation, 0, 0);
         }
 
         [Command]
         public void SetLook(Vector2 currentLook)
         {
-            float mouseX = Sensitivity * currentLook.x;
-            float mouseY = Sensitivity * currentLook.y;
-            CachedTransform.Rotate(0, mouseX, 0);
-            verticalRotation = Mathf.Clamp(verticalRotation - mouseY, -LookVerticalLimit, LookVerticalLimit);
-            PlayerCamera.transform.localRotation = Quaternion.Euler(verticalRotation, 0, 0);
+            //float mouseX = Sensitivity * currentLook.x;
+            //float mouseY = Sensitivity * currentLook.y;
+            CachedTransform.Rotate(0, currentLook.x, 0);
+            //PlayerCamera.transform.localRotation = Quaternion.Euler(currentLook.y, 0, 0);
         }
     }
 }

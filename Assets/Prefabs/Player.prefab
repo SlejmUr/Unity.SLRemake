@@ -92,10 +92,10 @@ MonoBehaviour:
   showOverlay: 0
   overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   bufferResetMultiplier: 3
-  useFixedUpdate: 0
-  positionSensitivity: 0.01
-  rotationSensitivity: 0.01
-  scaleSensitivity: 0.01
+  useFixedUpdate: 1
+  positionSensitivity: 0.1
+  rotationSensitivity: 0.1
+  scaleSensitivity: 0.1
 --- !u!143 &8413149714447424891
 CharacterController:
   m_ObjectHideFlags: 0
