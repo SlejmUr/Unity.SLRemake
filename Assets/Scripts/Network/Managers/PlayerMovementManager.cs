@@ -2,10 +2,10 @@ using Mirror;
 using SLRemake.Network.Behaviours;
 using UnityEngine;
 
-namespace SLRemake.Network.Controllers
+namespace SLRemake.Network.Managers
 {
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerMovementController : PlayerBehaviour
+    public class PlayerMovementManager : PlayerBehaviour
     {
         public static Vector3 DefaultGravity => new(0f, -19.6f, 0f);
         [SyncVar]
@@ -21,56 +21,60 @@ namespace SLRemake.Network.Controllers
         public float JumpSpeed = 4.9f;
 
         public CharacterController characterController;
-        public PlayerInputController InputController;
 
+        //[SyncVar]
         private Vector3 velocity = Vector3.zero;
 
-        public Vector3 Velocity => velocity;
+        private Vector2 serverMove;
+        private bool serverJump;
+        private bool serverSprint;
+        private bool serverCrouch;
 
         [HideInInspector]
         public bool CanMove = true;
 
         private void Update()
         {
+            if (!NetworkClient.active)
+                return;
             if (!isLocalPlayer)
                 return;
-            UpdateMovement();
+            serverMove = Player.InputManager.Move;
+            serverJump = Player.InputManager.IsJumping;
+            serverSprint = Player.InputManager.IsSprinting;
+            serverCrouch = Player.InputManager.IsCrouching;
+            HandleMovement();
         }
 
         private Vector3 WorldDirection()
         {
-            Vector2 move = InputController.Move;
+            Vector2 move = serverMove;
             return CachedTransform.TransformDirection(new Vector3(move.x, 0, move.y)).normalized;
         }
 
         private void HandleJump()
         {
-            Debug.Log(characterController.isGrounded);
             if (!characterController.isGrounded)
             {
-                velocity += 0.5f * Time.deltaTime * Gravity;
+                velocity += Time.deltaTime * Gravity;
             }
             else
             {
-                velocity.y = -0.5f;
-
-                if (InputController.IsJumping)
+                if (serverJump)
                 {
                     velocity.y = JumpSpeed;
-                    Debug.Log("setting jump speed");
                 }
             }
         }
 
-        [Command]
-        void UpdateMovement()
+        void HandleMovement()
         {
             float speed = WalkSpeed;
 
-            if (InputController.IsSprinting)
+            if (serverSprint)
                 speed = SprintSpeed;
 
-            if (InputController.IsCrouching)
+            if (serverCrouch)
                 speed = SneakSpeed;
 
             Vector3 world = WorldDirection();
@@ -78,20 +82,10 @@ namespace SLRemake.Network.Controllers
             velocity.z = world.z * speed;
 
             HandleJump();
-            Debug.Log(characterController.isGrounded);
-            MoveVelocity(velocity * Time.deltaTime);
-            
-            Debug.Log(characterController.isGrounded);
+
+            characterController.Move(velocity * Time.deltaTime);
         }
 
-
-        [Command]
-        private void MoveVelocity(Vector3 move)
-        {
-            Debug.Log(characterController.isGrounded);
-            characterController.Move(move);
-            Debug.Log(characterController.isGrounded);
-        }
 
         [Command]
         public void Teleport(Vector3 pos)

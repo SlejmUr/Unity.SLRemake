@@ -1,6 +1,5 @@
 using Mirror;
 using SLRemake.Extensions;
-using SLRemake.Network.Controllers;
 using SLRemake.Network.Managers;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,8 +17,8 @@ namespace SLRemake.Network
 
         public PlayerRoleManager RoleManager;
         public PlayerInventoryManager InventoryManager;
-        public PlayerMovementController MovementController;
-        public PlayerInputController InputController;
+        public PlayerMovementManager MovementManager;
+        public PlayerInputManager InputManager;
         public PlayerLookManager LookManager;
 
         private void Awake()

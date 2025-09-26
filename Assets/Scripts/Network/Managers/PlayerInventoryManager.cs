@@ -6,6 +6,7 @@ using SLRemake.InventorySystem.Items.Pickups;
 using SLRemake.InventorySystem.Items.ViewModel;
 using SLRemake.Loaders;
 using SLRemake.Network.Behaviours;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -21,6 +22,7 @@ namespace SLRemake.Network.Managers
         [SyncVar]
         public ItemBase CurrentItem;
 
+        private int SelectedIndex;
         private ViewModelBase CurrentViewModel;
         private ItemBase prevItem;
 
@@ -36,7 +38,6 @@ namespace SLRemake.Network.Managers
             if (!NetworkServer.active)
                 yield break;
             CmdRequestItem(ItemType.Test, 0);
-
         }
 
         [Command]
@@ -52,10 +53,24 @@ namespace SLRemake.Network.Managers
         {
             if (Items.Count < index && index != -1)
             {
-                Debug.Log("Items.Count < index || index != -1 | " + index);
+                //Debug.Log("Items.Count < index || index != -1 | " + index);
+                SelectItem(-1);
                 return;
             }
             SelectItem(index);
+        }
+
+        [Command]
+        public void CmdRequestSelectItemScroll(int scroll)
+        {
+            if (SelectedIndex == -1 && Items.Count == 0)
+                return;
+            int nextIndex = SelectedIndex + scroll;
+            if (nextIndex < 0)
+                return;
+            if (Items.Count < nextIndex)
+                return;
+            SelectItem(nextIndex);
         }
 
         [Command]
@@ -63,7 +78,7 @@ namespace SLRemake.Network.Managers
         {
             if (Items.Count < index)
             {
-                Debug.Log("Items.Count < index | " + index);
+                //Debug.Log("Items.Count < index | " + index);
                 return;
             }
             DropItem(index, throwing);
@@ -83,11 +98,11 @@ namespace SLRemake.Network.Managers
                 CurrentItem.gameObject.SetActive(false);
             if (index == -1)
             {
+                SelectedIndex = -1;
                 CurrentItem = null;
                 return;
             }
-            Debug.Log(Items.Count);
-            Debug.Log(index);
+            SelectedIndex = index;
             ItemBase item = Items[index];
             item.gameObject.SetActive(true);
             item.OnHolstered();
@@ -128,11 +143,9 @@ namespace SLRemake.Network.Managers
                 CurrentViewModel = null;
                 return;
             }
-            /*
-            CurrentViewModel = Instantiate(CurrentItem.ViewModelBase, Player.InputController.PlayerCamera.transform);
+            CurrentViewModel = Instantiate(CurrentItem.ViewModelBase, Player.LookManager.PlayerCamera.transform);
             CurrentViewModel.InitLocal(CurrentItem);
             CurrentViewModel.OnEquipped();
-            */
         }
 
         private void Items_OnAdded(int index)
